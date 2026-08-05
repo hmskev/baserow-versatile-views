@@ -1,0 +1,7 @@
+{
+  "name": "@hms/baserow-versatile-views",
+  "version": "0.2.0",
+  "private": true,
+  "main": "modules/versatile-views/module.js",
+  "type": "module"
+}
