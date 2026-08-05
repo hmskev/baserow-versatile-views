@@ -17,22 +17,6 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
-      - name: Build frontend with Baserow 2.3.3
-        shell: bash
-        run: |
-          set -euo pipefail
-          baserow_src="$RUNNER_TEMP/baserow-2.3.3"
-          git clone --filter=blob:none --sparse --depth 1 --branch 2.3.3 https://github.com/bramw/baserow.git "$baserow_src"
-          git -C "$baserow_src" sparse-checkout set web-frontend
-          docker run --rm --entrypoint /bin/bash \
-            -e NODE_ENV=development \
-            -v "$baserow_src:/src" \
-            -v "$GITHUB_WORKSPACE/web-frontend:/plugin" \
-            baserow/baserow:2.3.3 \
-            -lc 'cp -a /plugin /src/versatile-views-plugin && cd /src/web-frontend && yarn add file:/src/versatile-views-plugin --ignore-scripts && ADDITIONAL_MODULES=/src/web-frontend/node_modules/@hms/baserow-versatile-views/modules/versatile-views/module.js BASEROW_OSS_ONLY=1 yarn build'
-          rm -rf "$GITHUB_WORKSPACE/web-frontend/.output"
-          cp -a "$baserow_src/web-frontend/.output" "$GITHUB_WORKSPACE/web-frontend/.output"
-
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
