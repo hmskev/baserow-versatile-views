@@ -1,0 +1,8 @@
+services:
+  baserow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASEROW_VERSION: "2.3.3"
+    image: ghcr.io/hmskev/baserow-versatile-views:0.1.0

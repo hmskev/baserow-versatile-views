@@ -1,0 +1,12 @@
+{
+  "name": "Versatile Views",
+  "version": "0.1.0",
+  "supported_baserow_versions": "2.3.3",
+  "plugin_api_version": "0.1.0-alpha",
+  "description": "Generic permission-aware Kanban, calendar, and timeline APIs for arbitrary Baserow tables and fields.",
+  "author": "Haven Media Solutions",
+  "author_url": "https://havenmediasolutions.com",
+  "url": "https://github.com/hmskev/baserow-versatile-views",
+  "license": "MIT",
+  "contact": "support@havenmediasolutions.com"
+}
