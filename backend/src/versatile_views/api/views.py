@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from django.conf import settings
+from django.test import RequestFactory
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -96,8 +97,13 @@ class LayoutView(APIView):
         params["user_field_names"] = "false"
         if row_query.get("search"):
             params["search"] = str(row_query["search"])
-        request._request.GET = params
-        response = RowsView.as_view()(request._request, table_id=table_id)
+        nested_request = RequestFactory().get(
+            request._request.path,
+            data=params,
+        )
+        nested_request.user = request.user
+        nested_request.auth = getattr(request, "auth", None)
+        response = RowsView.as_view()(nested_request, table_id=table_id)
         if hasattr(response, "data"):
             return response.data.get("results", response.data.get("items", []))
         return []
