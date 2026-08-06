@@ -1,1 +1,0 @@
-{"version":3,"file":"GX2lcEYl.js","sources":["../../../modules/core/pages/loginPages.vue"],"sourcesContent":["<template>\n  <NuxtPage />\n</template>\n\n<script setup>\ndefinePageMeta({\n  name: 'login-pages',\n  layout: 'login',\n  middleware: ['settings', 'urlCheck'],\n})\n</script>\n"],"names":["_createBlock","_component_NuxtPage"],"mappings":"sdACEA,EAAYC,CAAA"}

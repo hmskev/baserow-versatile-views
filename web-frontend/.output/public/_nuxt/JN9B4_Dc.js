@@ -1,2 +1,0 @@
-import{bz as t,bd as o,be as r}from"./KxY7fQpA.js";(function(){try{var e=typeof window<"u"?window:typeof global<"u"?global:typeof globalThis<"u"?globalThis:typeof self<"u"?self:{},d=new e.Error().stack;d&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[d]="91e6d285-9bd0-446a-b933-d7d59848bfdd",e._sentryDebugIdIdentifier="sentry-dbid-91e6d285-9bd0-446a-b933-d7d59848bfdd")}catch{}})();const s={name:"RouterViewPlaceholder"};function a(e,d,n,f,i,b){return o(),r("div")}const l=t(s,[["render",a]]);export{l as default};
-//# sourceMappingURL=JN9B4_Dc.js.map
