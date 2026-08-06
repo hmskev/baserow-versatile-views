@@ -13,6 +13,11 @@ class _VersatileElementType(ElementType):
     allowed_fields = ["source_table_id", "config"]
     serializer_field_names = ["source_table_id", "config"]
 
+    def get_pytest_params(self, pytest_data_fixture):
+        # Baserow 2.3.3 requires every builder element type to provide this
+        # abstract hook. These elements have no related fixture parameters.
+        return {}
+
 
 class VersatileKanbanElementType(_VersatileElementType):
     type = "versatile_kanban"
