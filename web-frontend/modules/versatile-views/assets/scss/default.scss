@@ -1,0 +1,413 @@
+// Styles for the Haven Media Solutions view types.
+//
+// Colours and spacing come from Baserow's own CSS custom properties so these views
+// follow the active theme, including dark mode, without maintaining a second palette.
+
+// Shown when a view has not been told which field to use yet.
+.hms-view__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px;
+  text-align: center;
+}
+
+.hms-view__placeholder-icon {
+  font-size: 42px;
+  margin-bottom: 16px;
+  color: var(--color-neutral-400, #9b9b9b);
+}
+
+.hms-view__placeholder-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.hms-view__placeholder-text {
+  max-width: 420px;
+  color: var(--color-neutral-600, #666);
+}
+
+.hms-field-select {
+  padding: 10px 0;
+  min-width: 220px;
+}
+
+.hms-field-select__description,
+.hms-field-select__empty {
+  padding: 0 12px 8px;
+  color: var(--color-neutral-600, #666);
+  font-size: 12px;
+}
+
+// -- Kanban -----------------------------------------------------------------------
+
+.hms-kanban-view {
+  height: 100%;
+  overflow: hidden;
+}
+
+.hms-kanban-view__stacks {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  height: 100%;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.hms-kanban-view__stack {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 280px;
+  max-height: 100%;
+  border-radius: 6px;
+  background-color: var(--color-neutral-50, #f7f7f7);
+}
+
+.hms-kanban-view__stack--drop-target {
+  outline: 2px dashed var(--color-primary-500, #5190ef);
+  outline-offset: -2px;
+}
+
+.hms-kanban-view__stack-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.hms-kanban-view__stack-title {
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.hms-kanban-view__stack-count {
+  color: var(--color-neutral-600, #666);
+  font-size: 12px;
+}
+
+.hms-kanban-view__stack-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 8px 10px;
+  overflow-y: auto;
+}
+
+.hms-kanban-view__card {
+  cursor: pointer;
+}
+
+.hms-kanban-view__card--dragging {
+  opacity: 0.4;
+}
+
+.hms-kanban-view__add-card {
+  padding: 8px;
+  color: var(--color-neutral-600, #666);
+  border-radius: 4px;
+
+  &:hover {
+    background-color: var(--color-neutral-100, #eee);
+  }
+}
+
+// -- Calendar ---------------------------------------------------------------------
+
+.hms-calendar-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.hms-calendar-view__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-neutral-200, #e5e5e5);
+}
+
+.hms-calendar-view__period {
+  font-weight: 600;
+  min-width: 160px;
+}
+
+.hms-calendar-view__nav,
+.hms-calendar-view__today,
+.hms-timeline-view__nav,
+.hms-timeline-view__today {
+  padding: 4px 8px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: var(--color-neutral-100, #eee);
+  }
+}
+
+.hms-calendar-view__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--color-neutral-200, #e5e5e5);
+}
+
+.hms-calendar-view__weekday {
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-neutral-600, #666);
+}
+
+.hms-calendar-view__grid {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.hms-calendar-view__week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  min-height: 130px;
+}
+
+.hms-calendar-view__day {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border-right: 1px solid var(--color-neutral-200, #e5e5e5);
+  border-bottom: 1px solid var(--color-neutral-200, #e5e5e5);
+  min-width: 0;
+}
+
+.hms-calendar-view__day--outside {
+  background-color: var(--color-neutral-50, #fafafa);
+}
+
+.hms-calendar-view__day--today .hms-calendar-view__day-number {
+  background-color: var(--color-primary-500, #5190ef);
+  color: #fff;
+  border-radius: 50%;
+  padding: 1px 6px;
+}
+
+.hms-calendar-view__day--drop-target {
+  outline: 2px dashed var(--color-primary-500, #5190ef);
+  outline-offset: -2px;
+}
+
+.hms-calendar-view__day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.hms-calendar-view__day-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.hms-calendar-view__card {
+  cursor: pointer;
+}
+
+// -- Timeline ---------------------------------------------------------------------
+
+.hms-timeline-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.hms-timeline-view__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-neutral-200, #e5e5e5);
+}
+
+.hms-timeline-view__period {
+  font-weight: 600;
+}
+
+.hms-timeline-view__zoom {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.hms-timeline-view__zoom-option {
+  padding: 4px 10px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: var(--color-neutral-100, #eee);
+  }
+}
+
+.hms-timeline-view__zoom-option--active {
+  background-color: var(--color-primary-100, #e1ecfc);
+  color: var(--color-primary-600, #3b7cd4);
+}
+
+.hms-timeline-view__scroll {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.hms-timeline-view__axis {
+  position: relative;
+  height: 30px;
+  border-bottom: 1px solid var(--color-neutral-200, #e5e5e5);
+}
+
+.hms-timeline-view__tick {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  padding: 6px 4px;
+  font-size: 11px;
+  color: var(--color-neutral-600, #666);
+  border-left: 1px solid var(--color-neutral-200, #e5e5e5);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.hms-timeline-view__tick--today {
+  background-color: var(--color-primary-100, #e1ecfc);
+  font-weight: 600;
+}
+
+.hms-timeline-view__lane {
+  position: relative;
+  border-bottom: 1px solid var(--color-neutral-200, #e5e5e5);
+}
+
+.hms-timeline-view__lane-label {
+  padding: 6px 10px;
+  font-weight: 600;
+  font-size: 12px;
+  background-color: var(--color-neutral-50, #fafafa);
+  position: sticky;
+  left: 0;
+}
+
+.hms-timeline-view__row {
+  position: relative;
+  height: 32px;
+}
+
+.hms-timeline-view__bar {
+  position: absolute;
+  top: 4px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background-color: var(--color-primary-500, #5190ef);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+}
+
+.hms-timeline-view__bar--dragging {
+  opacity: 0.6;
+}
+
+.hms-timeline-view__bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Grab areas for changing just the start or just the end of a record.
+.hms-timeline-view__handle {
+  flex: 0 0 6px;
+  align-self: stretch;
+  cursor: ew-resize;
+  background-color: rgba(255, 255, 255, 0.45);
+}
+
+.hms-timeline-view__handle--start {
+  margin-left: -6px;
+}
+
+.hms-timeline-view__handle--end {
+  margin-right: -6px;
+  margin-left: auto;
+}
+
+.hms-timeline-view__undated {
+  padding: 10px 14px;
+  color: var(--color-neutral-600, #666);
+  font-size: 12px;
+  position: sticky;
+  left: 0;
+}
+
+// -- List -------------------------------------------------------------------------
+
+.hms-list-view {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.hms-list-view__body {
+  padding: 12px;
+  max-width: 900px;
+}
+
+.hms-list-view__section {
+  margin-bottom: 16px;
+}
+
+.hms-list-view__section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-neutral-200, #e5e5e5);
+}
+
+.hms-list-view__section-label {
+  font-weight: 600;
+}
+
+.hms-list-view__section-count {
+  color: var(--color-neutral-600, #666);
+  font-size: 12px;
+}
+
+.hms-list-view__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+.hms-list-view__row {
+  cursor: pointer;
+}
+
+.hms-list-view__add {
+  padding: 10px 4px;
+}
+
+.hms-list-view__add-link {
+  color: var(--color-neutral-600, #666);
+}
