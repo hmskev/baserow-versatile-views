@@ -59427,12 +59427,12 @@ const assets = {
     "size": 200399,
     "path": "../public/img/features/field_level_permissions.png"
   },
-  "/_nuxt/SJyJRsjO.js": {
+  "/_nuxt/KxY7fQpA.js": {
     "type": "text/javascript; charset=utf-8",
     "etag": "\"59056a-//IObCA75dCf801PDwLiXZpBJu4\"",
     "mtime": "2026-08-05T19:57:42.649Z",
     "size": 5834090,
-    "path": "../public/_nuxt/SJyJRsjO.js"
+    "path": "../public/_nuxt/KxY7fQpA.js"
   },
   "/img/features/kanban_view.png": {
     "type": "image/png",
@@ -59574,12 +59574,12 @@ const assets = {
     "size": 88,
     "path": "../public/_nuxt/builds/meta/22fd75e1-14a4-4c0f-be20-b8571e596eb3.json"
   },
-  "/_nuxt/SJyJRsjO.js.map": {
+  "/_nuxt/KxY7fQpA.js.map": {
     "type": "application/json",
     "etag": "\"117f222-uDoQzmypRfFpN6pmlgWYQPcEXDA\"",
     "mtime": "2026-08-05T19:57:42.652Z",
     "size": 18346530,
-    "path": "../public/_nuxt/SJyJRsjO.js.map"
+    "path": "../public/_nuxt/KxY7fQpA.js.map"
   }
 };
 
