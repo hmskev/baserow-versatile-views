@@ -3,7 +3,7 @@ import VersatileViewElement from './components/VersatileViewElement.vue'
 import VersatileViewElementForm from './components/VersatileViewElementForm.vue'
 
 class VersatileElementType extends ElementType {
-  get category() {
+  category() {
     return 'baseElement'
   }
 
