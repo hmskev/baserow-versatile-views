@@ -43,6 +43,31 @@
   font-size: 12px;
 }
 
+// Baserow's RowCard has no width of its own; the Gallery view sets one inline per
+// card. Ours sit in flex and grid containers instead, and a flex or grid item
+// defaults to min-width: auto, so one long text value makes the card as wide as its
+// longest unbroken line and stretches the whole column with it. Constrain the card to
+// its container and let long values wrap.
+.hms-card-container {
+  min-width: 0;
+
+  .card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .card__field,
+  .card__field-name,
+  .card__field-value {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
 // -- Kanban -----------------------------------------------------------------------
 
 .hms-kanban-view {
@@ -63,6 +88,9 @@
   display: flex;
   flex-direction: column;
   flex: 0 0 280px;
+  width: 280px;
+  max-width: 280px;
+  min-width: 0;
   max-height: 100%;
   border-radius: 6px;
   background-color: var(--color-neutral-50, #f7f7f7);
@@ -85,6 +113,10 @@
   font-weight: 600;
   border-radius: 4px;
   padding: 2px 8px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .hms-kanban-view__stack-count {
@@ -98,6 +130,7 @@
   gap: 8px;
   padding: 0 8px 10px;
   overflow-y: auto;
+  min-width: 0;
 }
 
 .hms-kanban-view__card {
@@ -213,6 +246,7 @@
   flex-direction: column;
   gap: 4px;
   overflow-y: auto;
+  min-width: 0;
 }
 
 .hms-calendar-view__card {
@@ -398,6 +432,7 @@
   flex-direction: column;
   gap: 6px;
   padding-top: 8px;
+  min-width: 0;
 }
 
 .hms-list-view__row {

@@ -27,7 +27,7 @@
 
         <div
           v-show="!collapsed.includes(section.key)"
-          class="hms-list-view__rows"
+          class="hms-list-view__rows hms-card-container"
         >
           <RowCard
             v-for="row in section.rows"

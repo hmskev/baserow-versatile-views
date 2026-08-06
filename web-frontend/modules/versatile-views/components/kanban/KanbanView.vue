@@ -32,7 +32,7 @@
           <div class="hms-kanban-view__stack-count">{{ stack.rows.length }}</div>
         </div>
 
-        <div class="hms-kanban-view__stack-cards">
+        <div class="hms-kanban-view__stack-cards hms-card-container">
           <RowCard
             v-for="row in stack.rows"
             :key="'hms-kanban-card-' + row.id"

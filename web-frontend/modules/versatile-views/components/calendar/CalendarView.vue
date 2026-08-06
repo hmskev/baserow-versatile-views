@@ -64,7 +64,7 @@
               </a>
             </div>
 
-            <div class="hms-calendar-view__day-cards">
+            <div class="hms-calendar-view__day-cards hms-card-container">
               <RowCard
                 v-for="row in rowsForDay(day)"
                 :key="'hms-calendar-card-' + row.id"
