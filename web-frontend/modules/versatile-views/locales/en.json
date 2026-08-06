@@ -6,7 +6,14 @@
     "list": "List"
   },
   "hmsView": {
-    "empty": "Empty"
+    "empty": "Empty",
+    "showMore": "Show {count} more",
+    "showMoreShort": "+{count} more",
+    "loadingRows": "Loading records\u2026 {loaded} of {total}",
+    "partialRows": "Showing {loaded} of {total} records.",
+    "cappedRows": "Showing the first {loaded} of {total} records. Add a filter to narrow this view.",
+    "loadErrorTitle": "Could not load all records",
+    "loadErrorMessage": "This view is showing only the records it managed to load. Try refreshing."
   },
   "hmsViewHeader": {
     "customizeCards": "Customize cards",

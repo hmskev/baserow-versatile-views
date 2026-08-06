@@ -11,6 +11,13 @@
     </div>
 
     <template v-else>
+      <ViewScaleNotice
+        :loaded="loadedRowCount"
+        :total="totalRowCount"
+        :loading="rowsLoading"
+        :ceiling-reached="rowLoadCeilingReached"
+      ></ViewScaleNotice>
+
       <div class="hms-timeline-view__toolbar">
         <a class="hms-timeline-view__nav" @click="movePeriod(-1)">
           <i class="iconoir-nav-arrow-left"></i>
@@ -65,7 +72,7 @@
 
           <div class="hms-timeline-view__lane-rows">
             <div
-              v-for="bar in lane.bars"
+              v-for="bar in cappedRows(lane.key, lane.bars)"
               :key="'hms-timeline-bar-' + bar.row.id"
               class="hms-timeline-view__row"
             >
@@ -97,6 +104,21 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <div
+          v-for="lane in lanes"
+          v-show="hiddenRowCount(lane.key, lane.bars) > 0"
+          :key="'hms-timeline-more-' + lane.key"
+          class="hms-timeline-view__undated"
+        >
+          <a @click="expandContainer(lane.key)">
+            {{
+              $t('hmsView.showMore', {
+                count: hiddenRowCount(lane.key, lane.bars),
+              })
+            }}
+          </a>
         </div>
 
         <div v-if="undatedRows.length > 0" class="hms-timeline-view__undated">
@@ -148,6 +170,9 @@ import RowEditModal from '@baserow/modules/database/components/row/RowEditModal'
 import viewHelpers from '@baserow/modules/database/mixins/viewHelpers'
 import viewDecoration from '@baserow/modules/database/mixins/viewDecoration'
 
+import cardViewRows from '../../mixins/cardViewRows'
+import ViewScaleNotice from '../shared/ViewScaleNotice.vue'
+
 import { readDate, writeDate } from '../../utils/dates'
 import { groupRowsByField } from '../../utils/grouping'
 import { WRITABLE_DATE_FIELD_TYPES } from '../../constants'
@@ -164,8 +189,8 @@ const VISIBLE_COLUMNS = { day: 45, week: 30, month: 24 }
  */
 export default {
   name: 'HmsTimelineView',
-  components: { RowEditModal },
-  mixins: [viewHelpers, viewDecoration],
+  components: { RowEditModal, ViewScaleNotice },
+  mixins: [viewHelpers, viewDecoration, cardViewRows],
   props: {
     fields: { type: Array, required: true },
     view: { type: Object, required: true },
@@ -191,8 +216,11 @@ export default {
   },
   computed: {
     ...mapGetters({ row: 'rowModalNavigation/getRow' }),
+    // Rows we hold values for. The store's raw array contains a null for
+    // every row not yet fetched, and a null cannot be placed in a stack, on a
+    // day or on the axis, so grouping must never see one.
     allRows() {
-      return this.$store.getters[`${this.storePrefix}view/hms_timeline/getRows`]
+      return this.loadedRows
     },
     fieldOptions() {
       return this.$store.getters[

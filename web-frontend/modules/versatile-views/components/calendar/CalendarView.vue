@@ -11,6 +11,13 @@
     </div>
 
     <template v-else>
+      <ViewScaleNotice
+        :loaded="loadedRowCount"
+        :total="totalRowCount"
+        :loading="rowsLoading"
+        :ceiling-reached="rowLoadCeilingReached"
+      ></ViewScaleNotice>
+
       <div class="hms-calendar-view__toolbar">
         <a class="hms-calendar-view__nav" @click="movePeriod(-1)">
           <i class="iconoir-nav-arrow-left"></i>
@@ -66,7 +73,7 @@
 
             <div class="hms-calendar-view__day-cards hms-card-container">
               <RowCard
-                v-for="row in rowsForDay(day)"
+                v-for="row in cappedRows(dayKey(day), rowsForDay(day))"
                 :key="'hms-calendar-card-' + row.id"
                 :fields="cardFields"
                 :row="row"
@@ -79,6 +86,18 @@
                 @dragend="onDragEnd"
                 @click="openRow(row)"
               ></RowCard>
+
+              <a
+                v-if="hiddenRowCount(dayKey(day), rowsForDay(day)) > 0"
+                class="hms-calendar-view__show-more"
+                @click.stop="expandContainer(dayKey(day))"
+              >
+                {{
+                  $t('hmsView.showMoreShort', {
+                    count: hiddenRowCount(dayKey(day), rowsForDay(day)),
+                  })
+                }}
+              </a>
             </div>
           </div>
         </div>
@@ -146,6 +165,9 @@ import RowEditModal from '@baserow/modules/database/components/row/RowEditModal'
 import viewHelpers from '@baserow/modules/database/mixins/viewHelpers'
 import viewDecoration from '@baserow/modules/database/mixins/viewDecoration'
 
+import cardViewRows from '../../mixins/cardViewRows'
+import ViewScaleNotice from '../shared/ViewScaleNotice.vue'
+
 import {
   chunkIntoWeeks,
   dayKey,
@@ -163,8 +185,8 @@ import {
  */
 export default {
   name: 'HmsCalendarView',
-  components: { RowCard, RowCreateModal, RowEditModal },
-  mixins: [viewHelpers, viewDecoration],
+  components: { RowCard, RowCreateModal, RowEditModal, ViewScaleNotice },
+  mixins: [viewHelpers, viewDecoration, cardViewRows],
   props: {
     fields: { type: Array, required: true },
     view: { type: Object, required: true },
@@ -184,8 +206,11 @@ export default {
   },
   computed: {
     ...mapGetters({ row: 'rowModalNavigation/getRow' }),
+    // Rows we hold values for. The store's raw array contains a null for
+    // every row not yet fetched, and a null cannot be placed in a stack, on a
+    // day or on the axis, so grouping must never see one.
     allRows() {
-      return this.$store.getters[`${this.storePrefix}view/hms_calendar/getRows`]
+      return this.loadedRows
     },
     fieldOptions() {
       return this.$store.getters[

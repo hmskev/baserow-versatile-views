@@ -66,11 +66,67 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
+
+  // A long text field can hold a whole article. Wrapping alone would make one card
+  // thousands of pixels tall and push every other record off the screen, so each
+  // value is clamped to a readable preview. The full text is one click away in the
+  // row modal.
+  .card__field-value {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    line-clamp: 4;
+    overflow: hidden;
+    max-height: 6em;
+  }
+}
+
+// Tells the user the view is not showing every record.
+.hms-scale-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--color-neutral-700, #4b4b4b);
+  background-color: var(--color-neutral-50, #fafafa);
+  border-bottom: 1px solid var(--color-neutral-200, #e5e5e5);
+  flex: 0 0 auto;
+}
+
+.hms-scale-notice--warning {
+  background-color: var(--color-warning-100, #fff4e0);
+  color: var(--color-warning-800, #8a5a00);
+}
+
+.hms-scale-notice__icon {
+  flex: 0 0 auto;
+}
+
+// "Show N more" inside a stack, day cell, section or swimlane.
+.hms-kanban-view__show-more,
+.hms-list-view__show-more,
+.hms-calendar-view__show-more {
+  display: block;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--color-primary-600, #3b7cd4);
+  border-radius: 4px;
+
+  &:hover {
+    background-color: var(--color-neutral-100, #eee);
+  }
+}
+
+.hms-calendar-view__show-more {
+  padding: 2px 4px;
 }
 
 // -- Kanban -----------------------------------------------------------------------
 
 .hms-kanban-view {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   overflow: hidden;
 }
@@ -79,7 +135,8 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   padding: 12px;
   overflow-x: auto;
 }
@@ -206,6 +263,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   min-height: 130px;
+  max-height: 320px;
 }
 
 .hms-calendar-view__day {
@@ -396,13 +454,22 @@
 // -- List -------------------------------------------------------------------------
 
 .hms-list-view {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  overflow: hidden;
+}
+
+.hms-list-view__body {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
 .hms-list-view__body {
   padding: 12px;
   max-width: 900px;
+  width: 100%;
 }
 
 .hms-list-view__section {

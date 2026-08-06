@@ -10,7 +10,15 @@
       </div>
     </div>
 
-    <div v-else class="hms-kanban-view__stacks">
+    <template v-else>
+      <ViewScaleNotice
+        :loaded="loadedRowCount"
+        :total="totalRowCount"
+        :loading="rowsLoading"
+        :ceiling-reached="rowLoadCeilingReached"
+      ></ViewScaleNotice>
+
+      <div class="hms-kanban-view__stacks">
       <div
         v-for="stack in stacks"
         :key="stack.key"
@@ -34,7 +42,7 @@
 
         <div class="hms-kanban-view__stack-cards hms-card-container">
           <RowCard
-            v-for="row in stack.rows"
+            v-for="row in cappedRows(stack.key, stack.rows)"
             :key="'hms-kanban-card-' + row.id"
             :fields="cardFields"
             :row="row"
@@ -50,6 +58,18 @@
           ></RowCard>
 
           <a
+            v-if="hiddenRowCount(stack.key, stack.rows) > 0"
+            class="hms-kanban-view__show-more"
+            @click="expandContainer(stack.key)"
+          >
+            {{
+              $t('hmsView.showMore', {
+                count: hiddenRowCount(stack.key, stack.rows),
+              })
+            }}
+          </a>
+
+          <a
             v-if="!readOnly"
             class="hms-kanban-view__add-card"
             @click="createRowInStack(stack)"
@@ -58,8 +78,9 @@
             {{ $t('hmsKanbanView.addCard') }}
           </a>
         </div>
+        </div>
       </div>
-    </div>
+    </template>
 
     <RowCreateModal
       v-if="!readOnly"
@@ -121,6 +142,9 @@ import RowEditModal from '@baserow/modules/database/components/row/RowEditModal'
 import viewHelpers from '@baserow/modules/database/mixins/viewHelpers'
 import viewDecoration from '@baserow/modules/database/mixins/viewDecoration'
 
+import cardViewRows from '../../mixins/cardViewRows'
+import ViewScaleNotice from '../shared/ViewScaleNotice.vue'
+
 const EMPTY_STACK_KEY = '__empty__'
 
 /**
@@ -131,8 +155,8 @@ const EMPTY_STACK_KEY = '__empty__'
  */
 export default {
   name: 'HmsKanbanView',
-  components: { RowCard, RowCreateModal, RowEditModal },
-  mixins: [viewHelpers, viewDecoration],
+  components: { RowCard, RowCreateModal, RowEditModal, ViewScaleNotice },
+  mixins: [viewHelpers, viewDecoration, cardViewRows],
   props: {
     fields: { type: Array, required: true },
     view: { type: Object, required: true },
@@ -151,8 +175,11 @@ export default {
   },
   computed: {
     ...mapGetters({ row: 'rowModalNavigation/getRow' }),
+    // Rows we hold values for. The store's raw array contains a null for
+    // every row not yet fetched, and a null cannot be placed in a stack, on a
+    // day or on the axis, so grouping must never see one.
     allRows() {
-      return this.$store.getters[`${this.storePrefix}view/hms_kanban/getRows`]
+      return this.loadedRows
     },
     fieldOptions() {
       return this.$store.getters[
