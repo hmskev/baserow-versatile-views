@@ -44,13 +44,20 @@ COPY --from=baserow-source /baserow-src/web-frontend /baserow/web-frontend/
 COPY --from=baserow-source /baserow-src/premium/web-frontend /baserow/premium/web-frontend/
 COPY --from=baserow-source /baserow-src/enterprise/web-frontend /baserow/enterprise/web-frontend/
 
+# premium/ and enterprise/ resolve their imports through a link to the single
+# installed dependency tree. The checkout may already carry a node_modules entry, and
+# `ln -s` would then create the link inside it, so clear the path first.
 RUN yarn install --pure-lockfile --cache-folder "$YARN_CACHE_FOLDER" \
-    && ln -s /baserow/web-frontend/node_modules/ /baserow/premium/web-frontend/node_modules \
-    && ln -s /baserow/web-frontend/node_modules/ /baserow/enterprise/web-frontend/node_modules
+    && rm -rf /baserow/premium/web-frontend/node_modules \
+              /baserow/enterprise/web-frontend/node_modules \
+    && ln -s /baserow/web-frontend/node_modules /baserow/premium/web-frontend/node_modules \
+    && ln -s /baserow/web-frontend/node_modules /baserow/enterprise/web-frontend/node_modules
 
 # Our plugin's frontend module.
 COPY web-frontend /baserow/plugins/versatile_views/web-frontend/
-RUN ln -s /baserow/web-frontend/node_modules/ /baserow/plugins/versatile_views/web-frontend/node_modules
+RUN rm -rf /baserow/plugins/versatile_views/web-frontend/node_modules \
+    && ln -s /baserow/web-frontend/node_modules \
+             /baserow/plugins/versatile_views/web-frontend/node_modules
 
 # ADDITIONAL_MODULES is Baserow's supported hook for compiling extra Nuxt modules
 # into the production build (see web-frontend/config/nuxt.config.base.ts).

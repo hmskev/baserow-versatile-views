@@ -22,18 +22,24 @@ import {
 /**
  * Registers our view types and Application Builder elements.
  *
- * `dependsOn` matters: the view type registry and the row store modules this plugin
- * adds to are set up by Baserow's own database and builder plugins, so those have to
- * run first.
+ * `dependsOn` matters. `database-store` creates the root store modules our row stores
+ * are registered next to, and `database` and `builder` create the registries we
+ * register into, so all three have to run first.
  */
 export default defineNuxtPlugin({
   name: 'versatile-views',
-  dependsOn: ['database', 'builder'],
+  dependsOn: ['database-store', 'database', 'builder'],
   setup(nuxtApp) {
     const context = { app: nuxtApp, store: nuxtApp.$store }
 
-    // Each view type keeps its own buffered window of rows, registered under
-    // `view/<type>` so the store paths used by the components resolve.
+    // Each view type keeps its own buffered window of rows.
+    //
+    // Baserow registers a view's row store once per context and addresses it through
+    // a store prefix, so `page/view/grid` is the table page and `template/view/grid`
+    // is the template preview. Components then dispatch to
+    // `${storePrefix}view/<type>/...`. Registering under only one prefix would break
+    // the other context, so both are registered here, exactly as Baserow does for
+    // its own grid, gallery and form stores.
     const stores = [
       ['hms_kanban', KanbanService],
       ['hms_calendar', CalendarService],
@@ -42,10 +48,15 @@ export default defineNuxtPlugin({
     ]
 
     for (const [name, service] of stores) {
-      nuxtApp.$store.registerModule(
-        ['view', name],
-        cardViewStore(service(nuxtApp.$client))
-      )
+      for (const prefix of ['page', 'template']) {
+        const path = `${prefix}/view/${name}`
+        if (!nuxtApp.$store.hasModule(path)) {
+          nuxtApp.$store.registerModuleNuxtSafe(
+            path,
+            cardViewStore(service(nuxtApp.$client))
+          )
+        }
+      }
     }
 
     nuxtApp.$registry.register('view', new HmsKanbanViewType(context))
