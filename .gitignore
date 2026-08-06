@@ -1,2 +1,8 @@
 __pycache__/
 *.pyc
+
+# Never commit build output. A committed .output whose Nitro manifest disagreed
+# with its chunks took production down; the image builds the frontend instead.
+web-frontend/.output/
+web-frontend/.nuxt/
+node_modules/

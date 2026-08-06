@@ -1,0 +1,62 @@
+{
+  "hmsViewType": {
+    "kanban": "Kanban",
+    "calendar": "Calendar",
+    "timeline": "Timeline",
+    "list": "List"
+  },
+  "hmsView": {
+    "empty": "Empty",
+    "showMore": "Show {count} more",
+    "showMoreShort": "+{count} more",
+    "loadingRows": "Loading records\u2026 {loaded} of {total}",
+    "partialRows": "Showing {loaded} of {total} records.",
+    "cappedRows": "Showing the first {loaded} of {total} records. Add a filter to narrow this view.",
+    "loadErrorTitle": "Could not load all records",
+    "loadErrorMessage": "This view is showing only the records it managed to load. Try refreshing."
+  },
+  "hmsViewHeader": {
+    "customizeCards": "Customize cards",
+    "customizeRows": "Customize rows",
+    "groupBy": "Group by",
+    "noFieldsAvailable": "This table has no fields that can be used here."
+  },
+  "hmsFieldSelect": {
+    "none": "None"
+  },
+  "hmsKanbanView": {
+    "stackBy": "Stack by",
+    "stackByDescription": "Choose the single select field that records are stacked by.",
+    "noSingleSelectFields": "This table has no single select field. Add one to stack records.",
+    "chooseFieldTitle": "Choose a field to stack by",
+    "chooseFieldText": "A Kanban view groups records into stacks by the value of a single select field.",
+    "addCard": "New record"
+  },
+  "hmsCalendarView": {
+    "dateFieldLabel": "Date field",
+    "dateFieldDescription": "Choose the date field that positions a record on the calendar.",
+    "noDateFields": "This table has no date field. Add one to place records on a calendar.",
+    "chooseFieldTitle": "Choose a date field",
+    "chooseFieldText": "A Calendar view places records on a date, taken from the field you choose.",
+    "today": "Today"
+  },
+  "hmsTimelineView": {
+    "startFieldLabel": "Start date",
+    "startFieldDescription": "Choose the date field where a record's bar starts.",
+    "endFieldLabel": "End date",
+    "endFieldDescription": "Choose the date field where a record's bar ends.",
+    "groupByLabel": "Swimlanes",
+    "groupByDescription": "Optionally split the timeline into swimlanes by a field's value.",
+    "chooseFieldsTitle": "Choose a start and an end date",
+    "chooseFieldsText": "A Timeline view draws each record as a bar between two dates.",
+    "today": "Today",
+    "zoomDay": "Day",
+    "zoomWeek": "Week",
+    "zoomMonth": "Month",
+    "undated": "{count} record(s) are not shown because they have no start or end date."
+  },
+  "hmsListView": {
+    "addRow": "New record",
+    "groupByDescription": "Optionally split the list into sections by a field's value."
+  }
+}

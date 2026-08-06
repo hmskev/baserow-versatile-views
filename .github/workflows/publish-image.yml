@@ -31,5 +31,5 @@ jobs:
           push: true
           build-args: BASEROW_VERSION=2.3.3
           tags: |
-            ghcr.io/${{ github.repository_owner }}/baserow-versatile-views:0.1.0
+            ghcr.io/${{ github.repository_owner }}/baserow-versatile-views:0.2.0
             ghcr.io/${{ github.repository_owner }}/baserow-versatile-views:latest
