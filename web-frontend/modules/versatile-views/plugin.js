@@ -18,6 +18,7 @@ import {
   ListService,
   TimelineService,
 } from './services/viewRows.js'
+import englishMessages from './locales/en.json'
 
 /**
  * Registers our view types and Application Builder elements.
@@ -28,9 +29,17 @@ import {
  */
 export default defineNuxtPlugin({
   name: 'versatile-views',
-  dependsOn: ['database-store', 'database', 'builder'],
+  dependsOn: ['i18n:plugin', 'database-store', 'database', 'builder'],
   setup(nuxtApp) {
     const context = { app: nuxtApp, store: nuxtApp.$store }
+
+    // Add our strings to the catalogue that already exists. mergeLocaleMessage is
+    // additive per locale, so Baserow's own translations stay exactly as they were.
+    // Registering a locale list through the i18n module hook instead replaced
+    // Baserow's locale configuration and left the whole app showing raw keys.
+    if (nuxtApp.$i18n?.mergeLocaleMessage) {
+      nuxtApp.$i18n.mergeLocaleMessage('en', englishMessages)
+    }
 
     // Each view type keeps its own buffered window of rows.
     //

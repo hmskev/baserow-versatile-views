@@ -20,13 +20,11 @@ export default defineNuxtModule({
     // build as everything else rather than loaded separately at runtime.
     nuxt.options.css.push(resolve('./assets/scss/default.scss'))
 
-    // Only English is shipped for now. Baserow falls back to the default locale for
-    // any language a module does not translate, so other languages keep working.
-    nuxt.hook('i18n:registerModule', (register) => {
-      register({
-        langDir: resolve('./locales'),
-        locales: [{ code: 'en', file: 'en.json' }],
-      })
-    })
+    // Translations are NOT registered through the `i18n:registerModule` hook here.
+    // That hook takes the full locale list a module supports, and passing a list of
+    // just English replaced Baserow's own locale configuration rather than adding to
+    // it, which left the entire app rendering raw keys - `sidebar.home`,
+    // `viewFilter.filter` and so on. The plugin merges our messages into the existing
+    // catalogue instead, which is additive and cannot drop anyone else's strings.
   },
 })
