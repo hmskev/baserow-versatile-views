@@ -51,10 +51,10 @@ export default defineNuxtPlugin({
       for (const prefix of ['page', 'template']) {
         const path = `${prefix}/view/${name}`
         if (!nuxtApp.$store.hasModule(path)) {
-          nuxtApp.$store.registerModuleNuxtSafe(
-            path,
-            cardViewStore(service(nuxtApp.$client))
-          )
+          // Pass the service factory itself, not a built service. Baserow's
+          // bufferedRows store calls `service($client)` at request time so it picks
+          // up the right client, including the public one for a shared view.
+          nuxtApp.$store.registerModuleNuxtSafe(path, cardViewStore(service))
         }
       }
     }

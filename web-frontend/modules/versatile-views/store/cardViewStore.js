@@ -16,6 +16,11 @@ export function populateRow(row, metadata = {}) {
   return row
 }
 
+/**
+ * @param service A service *factory* of the form (client) => service. Baserow's
+ *   bufferedRows store calls it as `service($client)` on each request, so passing an
+ *   already-built service makes it throw "service is not a function".
+ */
 export default function cardViewStore(service) {
   const rows = bufferedRows({ service, customPopulateRow: populateRow })
 
