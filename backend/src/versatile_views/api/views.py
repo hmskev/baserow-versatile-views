@@ -162,7 +162,11 @@ class LayoutView(APIView):
         )
         nested_request.user = user
         nested_request.auth = getattr(request, "auth", None)
-        response = RowsView.as_view()(nested_request, table_id=table_id)
+        class _PublishedRowsView(RowsView):
+            authentication_classes = ()
+            permission_classes = ()
+
+        response = _PublishedRowsView.as_view()(nested_request, table_id=table_id)
         if hasattr(response, "data"):
             return response.data.get("results", response.data.get("items", []))
         return []
