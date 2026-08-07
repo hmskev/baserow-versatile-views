@@ -5,7 +5,8 @@
       {{ error }}
     </div>
     <template v-else>
-      <div v-if="layout === 'kanban'" class="versatile-view-element__columns">
+      <PublicCalendarView v-if="layout === 'calendar'" :items="items"></PublicCalendarView>
+      <div v-else-if="layout === 'kanban'" class="versatile-view-element__columns">
         <section v-for="column in columns" :key="column.key" class="versatile-view-element__column">
           <h3>{{ column.label }}</h3>
           <article v-for="card in column.cards" :key="card.id" class="versatile-view-element__card">
@@ -28,8 +29,11 @@
 </template>
 
 <script>
+import PublicCalendarView from './PublicCalendarView.vue'
+
 export default {
   name: 'VersatileViewElement',
+  components: { PublicCalendarView },
   props: {
     element: { type: Object, required: true },
     mode: { type: String, default: 'editing' },
