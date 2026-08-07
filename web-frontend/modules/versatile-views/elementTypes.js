@@ -1,6 +1,7 @@
 import { ElementType } from '@baserow/modules/builder/elementTypes'
 import VersatileViewElement from './components/VersatileViewElement.vue'
 import VersatileViewElementForm from './components/VersatileViewElementForm.vue'
+import versatileKanbanImage from './assets/versatile-kanban.svg'
 
 class VersatileElementType extends ElementType {
   category() {
@@ -12,7 +13,7 @@ class VersatileElementType extends ElementType {
   }
 
   get image() {
-    return null
+    return versatileKanbanImage
   }
 
   get component() {
