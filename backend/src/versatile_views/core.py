@@ -78,8 +78,16 @@ def kanban(rows: Iterable[dict[str, Any]], config: dict[str, Any]) -> dict[str, 
         key = _scalar(_value(row, group_field))
         key = "__empty__" if key in (None, "") else str(key)
         grouped[key].append(_card(row, config))
-    columns = [{"key": key, "label": "(empty)" if key == "__empty__" else key, "cards": cards}
-               for key, cards in grouped.items()]
+    columns = [
+        {
+            "key": key,
+            "label": "(empty)" if key == "__empty__" else key,
+            "value": None if key == "__empty__" else key,
+            "field_id": group_field,
+            "cards": cards,
+        }
+        for key, cards in grouped.items()
+    ]
     return {"layout": "kanban", "columns": columns}
 
 

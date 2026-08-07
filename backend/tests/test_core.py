@@ -12,6 +12,8 @@ def test_kanban_groups_arbitrary_field_ids_and_keeps_values():
     result = build_layout("kanban", rows, {"group_field": 7, "display_fields": [8]})
     assert [column["label"] for column in result["columns"]] == ["Todo", "Done", "(empty)"]
     assert result["columns"][0]["cards"][0]["values"] == {"8": "A"}
+    assert result["columns"][0]["value"] == "Todo"
+    assert result["columns"][0]["field_id"] == 7
 
 
 def test_calendar_uses_start_and_optional_end_and_skips_invalid_rows():
