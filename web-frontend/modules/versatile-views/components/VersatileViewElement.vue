@@ -61,7 +61,9 @@ export default {
       this.loading = true
       this.error = null
       try {
-        const { data } = await this.$client.post(`/api/versatile-views/${this.layout}/`, {
+        // Baserow's configured API client already prefixes requests with `/api/`.
+        // Using an absolute `/api/...` path here produced `/api/api/...` and a 404.
+        const { data } = await this.$client.post(`versatile-views/${this.layout}/`, {
           table_id: this.element.source_table_id,
           config: this.element.config || {},
           rows: { page: 1, size: 200 },
