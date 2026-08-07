@@ -1,6 +1,6 @@
 <template>
   <div class="versatile-view-element">
-    <PublicPageNavigation v-if="mode === 'published' || mode === 'public'" />
+    <PublicPageNavigation />
     <div v-if="loading" class="versatile-view-element__state">Loading…</div>
     <div v-else-if="error" class="versatile-view-element__state versatile-view-element__state--error">
       {{ error }}

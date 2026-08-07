@@ -27,8 +27,12 @@ export default {
     async loadPages() {
       if (typeof window === 'undefined') return
       try {
-        const domain = encodeURIComponent(window.location.host)
-        const response = await fetch(`/api/builder/domains/published/by_name/${domain}/`)
+        const hostname = window.location.hostname
+        const apiHostname = hostname.startsWith('baserow.')
+          ? hostname
+          : `baserow.${hostname.split('.').slice(1).join('.')}`
+        const domain = encodeURIComponent(hostname)
+        const response = await fetch(`${window.location.protocol}//${apiHostname}/api/builder/domains/published/by_name/${domain}/`)
         if (!response.ok) return
         const data = await response.json()
         this.pages = (data.pages || [])
