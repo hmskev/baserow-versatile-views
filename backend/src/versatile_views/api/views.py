@@ -161,6 +161,7 @@ class LayoutView(APIView):
             data=params,
         )
         nested_request.user = user
+        nested_request._force_auth_user = user
         nested_request.auth = getattr(request, "auth", None)
         class _PublishedRowsView(RowsView):
             authentication_classes = ()
