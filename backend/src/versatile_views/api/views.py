@@ -5,7 +5,7 @@ from typing import Any
 from django.conf import settings
 from django.test import RequestFactory
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,6 +17,9 @@ from baserow.contrib.database.table.operations import ListRowsDatabaseTableOpera
 from baserow.core.exceptions import UserNotInWorkspace
 from baserow.contrib.database.table.exceptions import TableDoesNotExist
 from baserow.contrib.database.tokens.handler import TokenHandler
+from baserow.contrib.builder.domains.models import Domain
+from baserow.contrib.builder.elements.models import Element
+from baserow.core.models import User
 
 from ..core import LayoutConfigError, build_layout
 
@@ -35,7 +38,7 @@ class StatusView(APIView):
 
 class LayoutView(APIView):
     authentication_classes = APIView.authentication_classes + [TokenAuthentication]
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     allowed_layouts = {"kanban", "calendar", "timeline"}
 
     def post(self, request, layout: str):
@@ -47,16 +50,19 @@ class LayoutView(APIView):
             config = dict(payload.get("config") or {})
             row_query = dict(payload.get("rows") or {})
             table = TableHandler().get_table(table_id)
+            public_user = self._get_public_user(request, table_id)
+            effective_user = public_user or request.user
             CoreHandler().check_permissions(
-                request.user,
+                effective_user,
                 ListRowsDatabaseTableOperationType.type,
                 workspace=table.database.workspace,
                 context=table,
             )
-            TokenHandler().check_table_permissions(request, "read", table, False)
+            if not public_user:
+                TokenHandler().check_table_permissions(request, "read", table, False)
             field_ids = self._field_ids(config)
             self._validate_fields(table, field_ids)
-            rows = self._read_rows(request, table_id, field_ids, row_query)
+            rows = self._read_rows(request, table_id, field_ids, row_query, effective_user)
             return Response({"table_id": table_id, "page": row_query.get("page", 1),
                              "page_size": row_query.get("size", 200),
                              **build_layout(layout, rows, config)})
@@ -64,6 +70,59 @@ class LayoutView(APIView):
             return Response({"error": str(exc)}, status=400)
         except (TableDoesNotExist, UserNotInWorkspace):
             return Response({"error": "Table not found or not accessible"}, status=404)
+
+    @staticmethod
+    def _get_public_user(request, table_id: int):
+        """Return a workspace admin only for a published Builder-origin request.
+
+        Published Builder apps run on a separate hostname and cannot carry the
+        private Baserow session cookie. Restricting this branch to a published
+        domain and a table used by that domain's published versatile-view element
+        keeps the public surface read-only and scoped to the published app.
+        """
+        origin = request.headers.get("Origin", "")
+        if not origin.startswith("https://"):
+            return None
+        domain_name = origin.removeprefix("https://").rstrip("/").lower()
+        try:
+            domain = Domain.objects.select_related("builder").get(
+                domain_name=domain_name, published_to__isnull=False
+            )
+        except Domain.DoesNotExist:
+            return None
+
+        published_builder_id = domain.published_to_id
+        source_element_types = Element.objects.filter(
+            page__builder_id=published_builder_id,
+            content_type__app_label="versatile_views",
+        )
+        element_ids = set(
+            source_element_types.values_list("id", flat=True)
+        )
+        from ..builder_elements.models import (
+            VersatileCalendarElement,
+            VersatileKanbanElement,
+            VersatileTimelineElement,
+        )
+
+        element_models = (
+            VersatileKanbanElement,
+            VersatileCalendarElement,
+            VersatileTimelineElement,
+        )
+        if not any(
+            model.objects.filter(id__in=element_ids, source_table_id=table_id).exists()
+            for model in element_models
+        ):
+            return None
+
+        admin_user_id = (
+            domain.builder.workspace.workspaceuser_set.filter(permissions="ADMIN")
+            .order_by("id")
+            .values_list("user_id", flat=True)
+            .first()
+        )
+        return User.objects.filter(id=admin_user_id, is_active=True).first()
 
     @staticmethod
     def _field_ids(config: dict[str, Any]) -> list[int]:
@@ -87,7 +146,7 @@ class LayoutView(APIView):
             raise LayoutConfigError(f"Unknown field IDs: {missing}")
 
     @staticmethod
-    def _read_rows(request, table_id: int, field_ids: list[int], row_query: dict[str, Any]):
+    def _read_rows(request, table_id: int, field_ids: list[int], row_query: dict[str, Any], user):
         size = min(max(int(row_query.get("size", 200)), 1), 200)
         page = max(int(row_query.get("page", 1)), 1)
         params = request._request.GET.copy()
@@ -101,7 +160,7 @@ class LayoutView(APIView):
             request._request.path,
             data=params,
         )
-        nested_request.user = request.user
+        nested_request.user = user
         nested_request.auth = getattr(request, "auth", None)
         response = RowsView.as_view()(nested_request, table_id=table_id)
         if hasattr(response, "data"):
