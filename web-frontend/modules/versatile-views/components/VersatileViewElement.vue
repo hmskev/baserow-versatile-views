@@ -1,5 +1,6 @@
 <template>
   <div class="versatile-view-element">
+    <PublicPageNavigation v-if="mode === 'published' || mode === 'public'" />
     <div v-if="loading" class="versatile-view-element__state">Loading…</div>
     <div v-else-if="error" class="versatile-view-element__state versatile-view-element__state--error">
       {{ error }}
@@ -30,10 +31,11 @@
 
 <script>
 import PublicCalendarView from './PublicCalendarView.vue'
+import PublicPageNavigation from './PublicPageNavigation.vue'
 
 export default {
   name: 'VersatileViewElement',
-  components: { PublicCalendarView },
+  components: { PublicCalendarView, PublicPageNavigation },
   props: {
     element: { type: Object, required: true },
     mode: { type: String, default: 'editing' },
