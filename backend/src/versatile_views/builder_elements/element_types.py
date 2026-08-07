@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
+from baserow.contrib.builder.elements.element_types import HeadingElementType
 from baserow.contrib.builder.elements.registries import ElementType
 
 from .models import (
@@ -10,6 +11,12 @@ from .models import (
 
 
 class _VersatileElementType(ElementType):
+    # Baserow 2.3.3 uses this nested TypedDict while exporting Builder apps for
+    # publication. Reuse the release's common element schema and add our fields.
+    class SerializedDict(HeadingElementType.SerializedDict):
+        source_table_id: int | None
+        config: dict
+
     allowed_fields = ["source_table_id", "config"]
     serializer_field_names = ["source_table_id", "config"]
 
