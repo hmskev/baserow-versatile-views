@@ -14,6 +14,7 @@ from baserow.contrib.database.table.handler import TableHandler
 from baserow.core.handler import CoreHandler
 from baserow.core.registries import operation_type_registry
 from baserow.contrib.database.table.operations import ListRowsDatabaseTableOperationType
+from baserow.contrib.database.fields.registries import field_type_registry
 from baserow.core.exceptions import UserNotInWorkspace
 from baserow.contrib.database.table.exceptions import TableDoesNotExist
 from baserow.contrib.database.tokens.handler import TokenHandler
@@ -30,7 +31,7 @@ class StatusView(APIView):
     def get(self, request):
         return Response({
             "plugin": "versatile_views",
-            "version": "0.1.0",
+            "version": "0.3.0",
             "layouts": ["kanban", "calendar", "timeline"],
             "contract": "POST /api/versatile-views/{layout}/",
         })
@@ -65,6 +66,7 @@ class LayoutView(APIView):
             rows = self._read_rows(request, table_id, field_ids, row_query, effective_user)
             return Response({"table_id": table_id, "page": row_query.get("page", 1),
                              "page_size": row_query.get("size", 200),
+                             "fields": self._field_definitions(table, field_ids),
                              **build_layout(layout, rows, config)})
         except (KeyError, TypeError, ValueError, LayoutConfigError) as exc:
             return Response({"error": str(exc)}, status=400)
@@ -144,6 +146,28 @@ class LayoutView(APIView):
         missing = sorted(set(field_ids) - actual)
         if missing:
             raise LayoutConfigError(f"Unknown field IDs: {missing}")
+
+    @staticmethod
+    def _field_definitions(table, field_ids: list[int]) -> list[dict[str, Any]]:
+        fields = table.field_set.filter(id__in=field_ids).prefetch_related("select_options")
+        definitions = []
+        for field in fields:
+            field_type = field_type_registry.get_by_model(field.specific_class).type
+            options = []
+            if field_type in {"single_select", "multiple_select"}:
+                options = [
+                    {"id": option.id, "value": option.value, "color": option.color}
+                    for option in field.select_options.all()
+                ]
+            definitions.append({
+                "id": field.id,
+                "name": field.name,
+                "type": field_type,
+                "primary": bool(field.primary),
+                "read_only": bool(getattr(field, "read_only", False)),
+                "options": options,
+            })
+        return sorted(definitions, key=lambda item: item["id"])
 
     @staticmethod
     def _read_rows(request, table_id: int, field_ids: list[int], row_query: dict[str, Any], user):

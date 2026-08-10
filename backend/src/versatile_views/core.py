@@ -67,10 +67,19 @@ def _sort(rows: list[dict[str, Any]], field_id: int | str | None, direction: str
 
 def _card(row: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     display_fields = config.get("display_fields") or []
+    configured_fields = []
+    for key in ("display_fields", "group_field", "label_field", "color_field", "start_field", "end_field", "sort_field"):
+        value = config.get(key)
+        if isinstance(value, list):
+            configured_fields.extend(value)
+        elif value is not None:
+            configured_fields.append(value)
     values = {str(field_id): _value(row, field_id) for field_id in display_fields}
+    raw_values = {str(field_id): _value(row, field_id) for field_id in dict.fromkeys(configured_fields)}
     return {
         "id": row.get("id"),
         "values": values,
+        "raw_values": raw_values,
         "label": _scalar(_value(row, config.get("label_field"))),
         "color": _scalar(_value(row, config.get("color_field"))),
     }
