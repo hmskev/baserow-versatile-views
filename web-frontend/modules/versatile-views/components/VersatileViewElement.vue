@@ -69,18 +69,9 @@ export default {
     this.loadData()
   },
   methods: {
-    apiBase() {
-      const hostname = window.location.hostname
-      const apiHostname = hostname.startsWith('baserow.') ? hostname : `baserow.${hostname.split('.').slice(1).join('.')}`
-      return `${window.location.protocol}//${apiHostname}/api/`
-    },
-    async detectAuthenticatedEditor() {
-      try {
-        const response = await fetch(`${this.apiBase()}user/`, { credentials: 'include' })
-        this.canEdit = response.ok
-      } catch (error) {
-        this.canEdit = false
-      }
+    detectAuthenticatedEditor() {
+      // Baserow 2.3.3 exposes this endpoint as POST-only; use the hydrated auth store.
+      this.canEdit = Boolean(this.$store.getters['auth/getUserObject'])
     },
     onDragStart(card, event) {
       if (!this.canDrag) return
