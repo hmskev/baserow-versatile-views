@@ -77,12 +77,13 @@
           <h3>Comments</h3>
           <div v-if="commentsError" class="versatile-view-element__modal-error">{{ commentsError }}</div>
           <div v-if="commentsLoading" class="versatile-view-element__state">Loading comments…</div>
+          <div v-else-if="commentsUnavailable" class="versatile-view-element__comment-empty">Comments are unavailable because Baserow Premium row comments are not enabled on this server.</div>
           <div v-else-if="!comments.length" class="versatile-view-element__comment-empty">No comments yet.</div>
           <div v-for="comment in comments" :key="comment.id" class="versatile-view-element__comment">
             <strong>{{ comment.user?.name || comment.user?.first_name || 'User' }}</strong>
             <p>{{ comment.message }}</p>
           </div>
-          <form class="versatile-view-element__comment-form" @submit.prevent="addComment">
+          <form v-if="!commentsUnavailable" class="versatile-view-element__comment-form" @submit.prevent="addComment">
             <textarea v-model="commentDraft" rows="2" placeholder="Leave a comment…" />
             <button type="submit" class="versatile-view-element__primary" :disabled="commentSaving || !commentDraft.trim()">{{ commentSaving ? 'Posting…' : 'Post comment' }}</button>
           </form>
@@ -109,7 +110,7 @@ export default {
       draggingCard: null, dropColumnKey: null,
       modalOpen: false, editingCard: null, createColumn: null,
       formValues: {}, modalError: null, saving: false,
-      comments: [], commentsLoading: false, commentsError: null,
+      comments: [], commentsLoading: false, commentsError: null, commentsUnavailable: false,
       commentDraft: '', commentSaving: false,
     }
   },
@@ -203,24 +204,33 @@ export default {
     },
     async loadComments() {
       if (!this.editingCard) return
-      this.commentsLoading = true; this.commentsError = null
+      this.commentsLoading = true; this.commentsError = null; this.commentsUnavailable = false
       try {
         const { data } = await this.$client.get(`row_comments/${this.element.source_table_id}/${this.editingCard.id}/?limit=50`)
         this.comments = data.results || data.comments || data || []
       } catch (error) {
         this.comments = []
-        this.commentsError = error.response?.data?.error || 'Comments require the Baserow premium row-comments feature.'
+        if (error.response?.status === 402 || error.response?.data?.error === 'ERROR_FEATURE_NOT_AVAILABLE') {
+          this.commentsUnavailable = true
+        } else {
+          this.commentsError = error.response?.data?.error || 'Unable to load comments.'
+        }
       } finally { this.commentsLoading = false }
     },
     async addComment() {
-      if (!this.editingCard || !this.commentDraft.trim()) return
+      if (!this.editingCard || this.commentsUnavailable || !this.commentDraft.trim()) return
       this.commentSaving = true; this.commentsError = null
       try {
         await this.$client.post(`row_comments/${this.element.source_table_id}/${this.editingCard.id}/`, { message: this.commentDraft.trim() })
         this.commentDraft = ''
         await this.loadComments()
       } catch (error) {
-        this.commentsError = error.response?.data?.error || 'Unable to post this comment.'
+        if (error.response?.status === 402 || error.response?.data?.error === 'ERROR_FEATURE_NOT_AVAILABLE') {
+          this.commentsUnavailable = true
+          this.commentDraft = ''
+        } else {
+          this.commentsError = error.response?.data?.error || 'Unable to post this comment.'
+        }
       } finally { this.commentSaving = false }
     },
     async loadData() {
