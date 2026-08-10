@@ -54,25 +54,20 @@ export default {
     mode: { type: String, default: 'editing' },
   },
   data() {
-    return { loading: false, error: null, columns: [], items: [], canEdit: false, draggingCard: null, dropColumnKey: null }
+    return { loading: false, error: null, columns: [], items: [], draggingCard: null, dropColumnKey: null }
   },
   computed: {
     layout() { return this.element.type.replace('versatile_', '') },
-    canDrag() { return this.layout === 'kanban' && this.mode !== 'preview' && this.canEdit && this.element.config?.group_field != null },
+    canDrag() { return this.layout === 'kanban' && this.mode !== 'preview' && this.element.config?.group_field != null },
   },
   watch: {
     'element.source_table_id': 'loadData',
     'element.config': { handler: 'loadData', deep: true },
   },
   mounted() {
-    this.detectAuthenticatedEditor()
     this.loadData()
   },
   methods: {
-    detectAuthenticatedEditor() {
-      // Baserow 2.3.3 exposes this endpoint as POST-only; use the hydrated auth store.
-      this.canEdit = Boolean(this.$store.getters['auth/getUserObject'])
-    },
     onDragStart(card, event) {
       if (!this.canDrag) return
       this.draggingCard = card
