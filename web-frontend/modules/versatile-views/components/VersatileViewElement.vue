@@ -148,9 +148,9 @@ export default {
     openCreate(column) {
       this.editingCard = null; this.createColumn = column; this.modalError = null; this.commentDraft = ''
       this.formValues = {}
-      this.fields.forEach((field) => { this.$set(this.formValues, field.id, field.type === 'multiple_select' ? [] : '') })
+      this.fields.forEach((field) => { this.formValues[field.id] = field.type === 'multiple_select' ? [] : '' })
       const groupField = this.element.config.group_field
-      if (groupField != null && column.value != null) this.$set(this.formValues, groupField, column.value)
+      if (groupField != null && column.value != null) this.formValues[groupField] = column.value
       this.modalOpen = true
     },
     openEdit(card, focusComments = false) {
@@ -158,7 +158,7 @@ export default {
       this.formValues = {}
       this.fields.forEach((field) => {
         const value = card.raw_values?.[String(field.id)] ?? card.values?.[String(field.id)]
-        this.$set(this.formValues, field.id, this.formValue(value, field))
+        this.formValues[field.id] = this.formValue(value, field)
       })
       this.modalOpen = true
       this.loadComments()
