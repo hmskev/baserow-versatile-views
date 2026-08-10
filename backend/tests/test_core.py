@@ -16,6 +16,16 @@ def test_kanban_groups_arbitrary_field_ids_and_keeps_values():
     assert result["columns"][0]["field_id"] == 7
 
 
+def test_kanban_exposes_patch_value_for_select_columns():
+    result = build_layout(
+        "kanban",
+        [{"id": 1, "field_7": {"id": 42, "value": "Todo"}}],
+        {"group_field": 7},
+    )
+    assert result["columns"][0]["label"] == "Todo"
+    assert result["columns"][0]["value"] == 42
+
+
 def test_calendar_uses_start_and_optional_end_and_skips_invalid_rows():
     rows = [
         {"id": 1, "field_10": "2026-08-05", "field_11": "2026-08-07"},

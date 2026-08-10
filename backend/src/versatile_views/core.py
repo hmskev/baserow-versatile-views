@@ -29,6 +29,13 @@ def _scalar(value: Any) -> Any:
     return value
 
 
+def _update_value(value: Any) -> Any:
+    """Return the value accepted by Baserow's row PATCH endpoint."""
+    if isinstance(value, dict):
+        return value.get("id") or value.get("value") or value.get("name")
+    return value
+
+
 def _iso(value: Any) -> str | None:
     if value in (None, ""):
         return None
@@ -74,15 +81,18 @@ def kanban(rows: Iterable[dict[str, Any]], config: dict[str, Any]) -> dict[str, 
     if group_field is None:
         raise LayoutConfigError("group_field is required for kanban layouts")
     grouped: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
+    group_values: dict[str, Any] = {}
     for row in rows:
-        key = _scalar(_value(row, group_field))
+        raw_value = _value(row, group_field)
+        key = _scalar(raw_value)
         key = "__empty__" if key in (None, "") else str(key)
+        group_values.setdefault(key, _update_value(raw_value))
         grouped[key].append(_card(row, config))
     columns = [
         {
             "key": key,
             "label": "(empty)" if key == "__empty__" else key,
-            "value": None if key == "__empty__" else key,
+            "value": group_values[key],
             "field_id": group_field,
             "cards": cards,
         }

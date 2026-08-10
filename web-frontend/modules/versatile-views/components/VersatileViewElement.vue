@@ -2,11 +2,9 @@
   <div class="versatile-view-element">
     <PublicPageNavigation />
     <div v-if="loading" class="versatile-view-element__state">Loading…</div>
-    <div v-else-if="error" class="versatile-view-element__state versatile-view-element__state--error">
-      {{ error }}
-    </div>
+    <div v-else-if="error" class="versatile-view-element__state versatile-view-element__state--error">{{ error }}</div>
     <template v-else>
-      <PublicCalendarView v-if="layout === 'calendar'" :items="items"></PublicCalendarView>
+      <PublicCalendarView v-if="layout === 'calendar'" :items="items" />
       <div v-else-if="layout === 'kanban'" class="versatile-view-element__columns">
         <section
           v-for="column in columns"
@@ -22,15 +20,15 @@
             v-for="card in column.cards"
             :key="card.id"
             class="versatile-view-element__card"
+            :class="{ 'versatile-view-element__card--dragging': draggingCard?.id === card.id }"
             :draggable="canDrag"
             @dragstart="onDragStart(card, $event)"
             @dragend="onDragEnd"
           >
             <strong>{{ card.label || card.id }}</strong>
-            <p v-if="card.values && Object.keys(card.values).length">
-              {{ Object.values(card.values).map(formatValue).join(' · ') }}
-            </p>
+            <p v-if="card.values && Object.keys(card.values).length">{{ Object.values(card.values).map(formatValue).join(' · ') }}</p>
           </article>
+          <div v-if="!column.cards.length" class="versatile-view-element__drop-hint">Drop cards here</div>
         </section>
       </div>
       <div v-else class="versatile-view-element__items">
@@ -56,23 +54,11 @@ export default {
     mode: { type: String, default: 'editing' },
   },
   data() {
-    return {
-      loading: false,
-      error: null,
-      columns: [],
-      items: [],
-      canEdit: false,
-      draggingCard: null,
-      dropColumnKey: null,
-    }
+    return { loading: false, error: null, columns: [], items: [], canEdit: false, draggingCard: null, dropColumnKey: null }
   },
   computed: {
-    layout() {
-      return this.element.type.replace('versatile_', '')
-    },
-    canDrag() {
-      return this.layout === 'kanban' && this.canEdit && this.element.config?.group_field != null
-    },
+    layout() { return this.element.type.replace('versatile_', '') },
+    canDrag() { return this.layout === 'kanban' && this.mode !== 'preview' && this.canEdit && this.element.config?.group_field != null },
   },
   watch: {
     'element.source_table_id': 'loadData',
@@ -85,9 +71,7 @@ export default {
   methods: {
     apiBase() {
       const hostname = window.location.hostname
-      const apiHostname = hostname.startsWith('baserow.')
-        ? hostname
-        : `baserow.${hostname.split('.').slice(1).join('.')}`
+      const apiHostname = hostname.startsWith('baserow.') ? hostname : `baserow.${hostname.split('.').slice(1).join('.')}`
       return `${window.location.protocol}//${apiHostname}/api/`
     },
     async detectAuthenticatedEditor() {
@@ -118,16 +102,17 @@ export default {
       const card = this.draggingCard
       this.onDragEnd()
       if (!card || !this.canDrag) return
-      const groupField = this.element.config.group_field
-      const payload = { [`field_${groupField}`]: column.value }
+      this.loading = true
+      this.error = null
       try {
-        await this.$client.patch(
-          `database/rows/table/${this.element.source_table_id}/${card.id}/`,
-          payload
-        )
+        await this.$client.patch(`database/rows/table/${this.element.source_table_id}/${card.id}/`, {
+          [`field_${this.element.config.group_field}`]: column.value,
+        })
         await this.loadData()
       } catch (error) {
-        this.error = error.response?.data?.error || 'Unable to move this card.'
+        this.error = error.response?.data?.error || 'Unable to move this card. Check that you have write access to the table.'
+      } finally {
+        this.loading = false
       }
     },
     formatValue(value) {
@@ -141,8 +126,6 @@ export default {
       this.loading = true
       this.error = null
       try {
-        // Baserow's configured API client already prefixes requests with `/api/`.
-        // Using an absolute `/api/...` path here produced `/api/api/...` and a 404.
         const { data } = await this.$client.post(`versatile-views/${this.layout}/`, {
           table_id: this.element.source_table_id,
           config: this.element.config || {},
@@ -169,6 +152,8 @@ export default {
 .versatile-view-element__card, .versatile-view-element__item { background: white; border: 1px solid #dfe1e6; border-radius: 5px; padding: 9px; margin-bottom: 8px; }
 .versatile-view-element__card[draggable='true'] { cursor: grab; }
 .versatile-view-element__card[draggable='true']:active { cursor: grabbing; }
+.versatile-view-element__card--dragging { opacity: 0.45; }
+.versatile-view-element__drop-hint { min-height: 42px; border: 1px dashed #98a2b3; border-radius: 5px; color: #667085; padding: 12px; text-align: center; }
 .versatile-view-element__card p { margin: 6px 0 0; color: #667085; font-size: 12px; }
 .versatile-view-element__item { display: flex; justify-content: space-between; gap: 12px; }
 .versatile-view-element__state { color: #667085; padding: 16px; }
