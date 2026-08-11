@@ -13,7 +13,7 @@
       <FormInput v-model="values.config.group_field" type="number" placeholder="e.g. 1234" />
     </FormGroup>
     <FormGroup
-      v-if="layout === 'gallery'"
+      v-if="layout === 'kanban' || layout === 'gallery'"
       label="Image field ID"
       small-label
       required

@@ -30,6 +30,19 @@
             @dragstart="onDragStart(card, $event)"
             @dragend="onDragEnd"
           >
+            <div v-if="card.image" class="versatile-view-element__featured-image">
+              <img :src="card.image" :alt="`${card.label || 'Record'} featured image`" loading="lazy" />
+              <a
+                class="versatile-view-element__download-image"
+                :href="card.image"
+                download
+                target="_blank"
+                rel="noopener"
+                @click.stop
+              >
+                Download image
+              </a>
+            </div>
             <div class="versatile-view-element__card-title">
               <strong>{{ card.label || card.id }}</strong>
               <button class="versatile-view-element__comment-button" type="button" @click.stop="openEdit(card, true)">Comments</button>
@@ -256,7 +269,10 @@ export default {
 .versatile-view-element__column--drop-target { background: #eff8ff; box-shadow: inset 0 0 0 2px #84caff; }
 .versatile-view-element__column-header, .versatile-view-element__card-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .versatile-view-element__column h3 { margin: 0 0 8px; font-size: 14px; }
-.versatile-view-element__card, .versatile-view-element__item { background: white; border: 1px solid #dfe1e6; border-radius: 5px; padding: 9px; margin-bottom: 8px; }
+.versatile-view-element__featured-image { margin: -1px -1px 10px; overflow: hidden; border-radius: 5px 5px 0 0; background: #f2f4f7; }
+.versatile-view-element__featured-image img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.versatile-view-element__download-image { display: block; padding: 7px 9px; color: #1570ef; font-size: 12px; font-weight: 600; text-decoration: none; background: #fff; }
+.versatile-view-element__download-image:hover { color: #0b4fbb; text-decoration: underline; }
 .versatile-view-element__card { cursor: pointer; }
 .versatile-view-element__card[draggable='true'] { cursor: grab; }
 .versatile-view-element__card[draggable='true']:active { cursor: grabbing; }

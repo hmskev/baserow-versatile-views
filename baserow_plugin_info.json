@@ -1,6 +1,6 @@
 {
   "name": "Versatile Views",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "supported_baserow_versions": "2.3.3",
   "plugin_api_version": "0.1.0-alpha",
   "description": "Airtable-parity view types for Baserow: Kanban, Calendar, Timeline/Gantt and List, plus a permission-aware layout API.",

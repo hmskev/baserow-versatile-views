@@ -15,7 +15,6 @@ def test_kanban_groups_arbitrary_field_ids_and_keeps_values():
     assert result["columns"][0]["value"] == "Todo"
     assert result["columns"][0]["field_id"] == 7
 
-
 def test_kanban_exposes_patch_value_for_select_columns():
     result = build_layout(
         "kanban",
@@ -24,6 +23,22 @@ def test_kanban_exposes_patch_value_for_select_columns():
     )
     assert result["columns"][0]["label"] == "Todo"
     assert result["columns"][0]["value"] == 42
+
+
+def test_kanban_exposes_featured_image_url_and_download_source():
+    result = build_layout(
+        "kanban",
+        [{
+            "id": 1,
+            "field_7": "Todo",
+            "field_9": [{
+                "url": "https://files.example.test/original.jpg",
+                "thumbnails": {"large": {"url": "https://files.example.test/large.jpg"}},
+            }],
+        }],
+        {"group_field": 7, "image_field": 9},
+    )
+    assert result["columns"][0]["cards"][0]["image"] == "https://files.example.test/large.jpg"
 
 
 def test_calendar_uses_start_and_optional_end_and_skips_invalid_rows():
