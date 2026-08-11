@@ -20,32 +20,51 @@ export default {
     return { pages: [], currentPath: '/' }
   },
   mounted() {
-    this.currentPath = window.location.pathname || '/'
+    const pathname = window.location.pathname || '/'
+    const preview = pathname.match(/^\/builder\/(\d+)\/preview(?:\/|$)/)
+    this.currentPath = preview
+      ? pathname.slice(preview[0].length - 1) || '/'
+      : pathname
     this.loadPages()
   },
   methods: {
+    normalizePages(rawPages, basePath = '') {
+      return (rawPages || [])
+        .filter((page) => !page.shared && page.path && page.path !== '__shared__')
+        .map((page) => {
+          const path = page.path.startsWith('/') ? page.path : `/${page.path}`
+          return { id: page.id, name: page.name, path: `${basePath}${path}` || '/' }
+        })
+    },
     async loadPages() {
       if (typeof window === 'undefined') return
+      const pathname = window.location.pathname || '/'
+      const preview = pathname.match(/^\/builder\/(\d+)\/preview(?:\/|$)/)
+      const basePath = preview ? `/builder/${preview[1]}/preview` : ''
+
+      // The published Builder page already has its complete page list in the
+      // Builder store. Prefer it; this works for preview pages and avoids a
+      // domain lookup that is unavailable on the main Baserow hostname.
+      try {
+        const builder = this.$store?.getters?.['application/getSelected']
+        const visiblePages = builder
+          ? this.$store.getters['page/getVisiblePages'](builder)
+          : []
+        if (visiblePages?.length) {
+          this.pages = this.normalizePages(visiblePages, basePath)
+          return
+        }
+      } catch (error) {
+        // Fall through to the public-domain API for standalone published hosts.
+      }
+
       try {
         const hostname = window.location.hostname
         const domain = encodeURIComponent(hostname)
-        const apiUrls = [
-          `${window.location.origin}/api/builder/domains/published/by_name/${domain}/`,
-        ]
-        if (!hostname.startsWith('baserow.')) {
-          const apiHostname = `baserow.${hostname.split('.').slice(1).join('.')}`
-          apiUrls.push(`${window.location.protocol}//${apiHostname}/api/builder/domains/published/by_name/${domain}/`)
-        }
-        let response
-        for (const url of apiUrls) {
-          response = await fetch(url)
-          if (response.ok) break
-        }
-        if (!response?.ok) return
+        const response = await fetch(`${window.location.origin}/api/builder/domains/published/by_name/${domain}/`)
+        if (!response.ok) return
         const data = await response.json()
-        this.pages = (data.pages || [])
-          .filter((page) => !page.shared && page.path && page.path !== '__shared__')
-          .map((page) => ({ id: page.id, name: page.name, path: page.path.startsWith('/') ? page.path : `/${page.path}` }))
+        this.pages = this.normalizePages(data.pages)
       } catch (error) {
         // Navigation is supplemental; the view remains usable if metadata is unavailable.
       }
