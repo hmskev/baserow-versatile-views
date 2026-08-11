@@ -77,20 +77,22 @@ export default {
 .public-page-navigation {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
-  padding: 8px 12px;
-  margin: 0 0 12px;
-  background: #f8f9fb;
-  border: 1px solid #e4e7ec;
-  border-radius: 6px;
+  padding: 7px;
+  margin: 0 0 18px;
+  background: #fff;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, .05);
 }
 .public-page-navigation__link {
   display: inline-block;
-  padding: 6px 10px;
-  border-radius: 4px;
+  padding: 8px 11px;
+  border-radius: 7px;
   color: #344054;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
   text-decoration: none;
 }
 .public-page-navigation__link:hover,
