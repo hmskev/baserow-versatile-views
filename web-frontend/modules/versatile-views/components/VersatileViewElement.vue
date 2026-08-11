@@ -206,7 +206,7 @@ export default {
       if (!this.editingCard) return
       this.commentsLoading = true; this.commentsError = null; this.commentsUnavailable = false
       try {
-        const { data } = await this.$client.get(`row_comments/${this.element.source_table_id}/${this.editingCard.id}/?limit=50`)
+        const { data } = await this.$client.get(`versatile-views/comments/${this.element.source_table_id}/${this.editingCard.id}/`)
         this.comments = data.results || data.comments || data || []
       } catch (error) {
         this.comments = []
@@ -221,7 +221,7 @@ export default {
       if (!this.editingCard || this.commentsUnavailable || !this.commentDraft.trim()) return
       this.commentSaving = true; this.commentsError = null
       try {
-        await this.$client.post(`row_comments/${this.element.source_table_id}/${this.editingCard.id}/`, { message: this.commentDraft.trim() })
+        await this.$client.post(`versatile-views/comments/${this.element.source_table_id}/${this.editingCard.id}/`, { message: this.commentDraft.trim(), author_name: 'Guest' })
         this.commentDraft = ''
         await this.loadComments()
       } catch (error) {

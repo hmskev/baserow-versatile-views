@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.test import RequestFactory
@@ -31,7 +32,7 @@ class StatusView(APIView):
     def get(self, request):
         return Response({
             "plugin": "versatile_views",
-            "version": "0.3.0",
+            "version": "0.4.0",
             "layouts": ["kanban", "calendar", "timeline"],
             "contract": "POST /api/versatile-views/{layout}/",
         })
@@ -83,9 +84,12 @@ class LayoutView(APIView):
         keeps the public surface read-only and scoped to the published app.
         """
         origin = request.headers.get("Origin", "")
-        if not origin.startswith("https://"):
+        if not origin:
+            origin = request.headers.get("Referer", "")
+        parsed_origin = urlparse(origin)
+        if parsed_origin.scheme != "https" or not parsed_origin.netloc:
             return None
-        domain_name = origin.removeprefix("https://").rstrip("/").lower()
+        domain_name = parsed_origin.netloc.lower()
         try:
             domain = Domain.objects.select_related("builder").get(
                 domain_name=domain_name, published_to__isnull=False
