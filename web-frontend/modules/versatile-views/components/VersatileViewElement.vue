@@ -34,7 +34,7 @@
               <img :src="card.image" :alt="`${card.label || 'Record'} featured image`" loading="lazy" />
               <a
                 class="versatile-view-element__download-image"
-                :href="card.image"
+                :href="card.download_source || card.image"
                 download
                 target="_blank"
                 rel="noopener"
