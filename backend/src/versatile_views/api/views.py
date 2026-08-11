@@ -32,7 +32,7 @@ class StatusView(APIView):
     def get(self, request):
         return Response({
             "plugin": "versatile_views",
-            "version": "0.5.0",
+            "version": "0.5.3",
             "layouts": ["kanban", "calendar", "timeline", "gallery"],
             "contract": "POST /api/versatile-views/{layout}/",
         })

@@ -13,6 +13,7 @@ class VersatileViewsConfig(AppConfig):
             VersatileCalendarElementType,
             VersatileKanbanElementType,
             VersatileTimelineElementType,
+            VersatileGalleryElementType,
         )
         from .plugins import VersatileViewsPlugin
         from .views.view_types import (
@@ -28,6 +29,7 @@ class VersatileViewsConfig(AppConfig):
         element_type_registry.register(VersatileKanbanElementType())
         element_type_registry.register(VersatileCalendarElementType())
         element_type_registry.register(VersatileTimelineElementType())
+        element_type_registry.register(VersatileGalleryElementType())
 
         # Table view types, shown in the view switcher next to Grid and Gallery.
         view_type_registry.register(KanbanViewType())
