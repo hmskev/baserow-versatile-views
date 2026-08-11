@@ -29,6 +29,11 @@ class VersatileTimelineElement(Element, VersatileViewElementFields):
         verbose_name = "Versatile Timeline element"
 
 
+class VersatileGalleryElement(Element, VersatileViewElementFields):
+    class Meta:
+        verbose_name = "Versatile Gallery element"
+
+
 class VersatileComment(models.Model):
     """Comments stored by the plugin for published/private view cards."""
 

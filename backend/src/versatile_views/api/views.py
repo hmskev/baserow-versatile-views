@@ -32,8 +32,8 @@ class StatusView(APIView):
     def get(self, request):
         return Response({
             "plugin": "versatile_views",
-            "version": "0.4.0",
-            "layouts": ["kanban", "calendar", "timeline"],
+            "version": "0.5.0",
+            "layouts": ["kanban", "calendar", "timeline", "gallery"],
             "contract": "POST /api/versatile-views/{layout}/",
         })
 
@@ -41,7 +41,7 @@ class StatusView(APIView):
 class LayoutView(APIView):
     authentication_classes = APIView.authentication_classes + [TokenAuthentication]
     permission_classes = (AllowAny,)
-    allowed_layouts = {"kanban", "calendar", "timeline"}
+    allowed_layouts = {"kanban", "calendar", "timeline", "gallery"}
 
     def post(self, request, layout: str):
         if layout not in self.allowed_layouts:
@@ -115,6 +115,7 @@ class LayoutView(APIView):
             VersatileKanbanElement,
             VersatileCalendarElement,
             VersatileTimelineElement,
+            VersatileGalleryElement,
         )
         if not any(
             model.objects.filter(id__in=element_ids, source_table_id=table_id).exists()
@@ -132,7 +133,7 @@ class LayoutView(APIView):
 
     @staticmethod
     def _field_ids(config: dict[str, Any]) -> list[int]:
-        keys = ["display_fields", "group_field", "start_field", "end_field", "label_field", "color_field", "sort_field"]
+        keys = ["display_fields", "group_field", "start_field", "end_field", "label_field", "color_field", "image_field", "sort_field"]
         values: list[int] = []
         for key in keys:
             value = config.get(key)

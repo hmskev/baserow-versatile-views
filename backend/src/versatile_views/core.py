@@ -65,10 +65,23 @@ def _sort(rows: list[dict[str, Any]], field_id: int | str | None, direction: str
     return sorted(rows, key=lambda row: (str(_scalar(_value(row, field_id)) or "").lower()), reverse=reverse)
 
 
+def _image_url(value: Any) -> str | None:
+    if isinstance(value, list):
+        return _image_url(value[0]) if value else None
+    if isinstance(value, dict):
+        thumbnails = value.get("thumbnails") or {}
+        for key in ("large", "card_cover", "small"):
+            thumbnail = thumbnails.get(key)
+            if isinstance(thumbnail, dict) and thumbnail.get("url"):
+                return thumbnail["url"]
+        return value.get("url")
+    return None
+
+
 def _card(row: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     display_fields = config.get("display_fields") or []
     configured_fields = []
-    for key in ("display_fields", "group_field", "label_field", "color_field", "start_field", "end_field", "sort_field"):
+    for key in ("display_fields", "group_field", "label_field", "color_field", "image_field", "start_field", "end_field", "sort_field"):
         value = config.get(key)
         if isinstance(value, list):
             configured_fields.extend(value)
@@ -82,6 +95,7 @@ def _card(row: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
         "raw_values": raw_values,
         "label": _scalar(_value(row, config.get("label_field"))),
         "color": _scalar(_value(row, config.get("color_field"))),
+        "image": _image_url(_value(row, config.get("image_field"))),
     }
 
 
@@ -135,6 +149,13 @@ def timeline(rows: Iterable[dict[str, Any]], config: dict[str, Any]) -> dict[str
     return _dated(rows, config, "timeline")
 
 
+def gallery(rows: Iterable[dict[str, Any]], config: dict[str, Any]) -> dict[str, Any]:
+    image_field = config.get("image_field")
+    if image_field is None:
+        raise LayoutConfigError("image_field is required for gallery layouts")
+    return {"layout": "gallery", "items": [_card(row, config) for row in rows]}
+
+
 def build_layout(layout: str, rows: Iterable[dict[str, Any]], config: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(config, dict):
         raise LayoutConfigError("config must be an object")
@@ -144,4 +165,6 @@ def build_layout(layout: str, rows: Iterable[dict[str, Any]], config: dict[str, 
         return calendar(_sort(list(rows), config.get("sort_field"), config.get("sort_direction", "asc")), config)
     if layout == "timeline":
         return timeline(_sort(list(rows), config.get("sort_field"), config.get("sort_direction", "asc")), config)
-    raise LayoutConfigError("layout must be one of: kanban, calendar, timeline")
+    if layout == "gallery":
+        return gallery(_sort(list(rows), config.get("sort_field"), config.get("sort_direction", "asc")), config)
+    raise LayoutConfigError("layout must be one of: kanban, calendar, timeline, gallery")

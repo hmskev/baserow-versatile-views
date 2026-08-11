@@ -4,7 +4,8 @@
     <div v-if="loading" class="versatile-view-element__state">Loading…</div>
     <div v-else-if="error" class="versatile-view-element__state versatile-view-element__state--error">{{ error }}</div>
     <template v-else>
-      <PublicCalendarView v-if="layout === 'calendar'" :items="items" />
+      <PublicGalleryView v-if="layout === 'gallery'" :items="items" />
+      <PublicCalendarView v-else-if="layout === 'calendar'" :items="items" />
       <div v-else-if="layout === 'kanban'" class="versatile-view-element__columns">
         <section
           v-for="column in columns"
@@ -95,11 +96,12 @@
 
 <script>
 import PublicCalendarView from './PublicCalendarView.vue'
+import PublicGalleryView from './PublicGalleryView.vue'
 import PublicPageNavigation from './PublicPageNavigation.vue'
 
 export default {
   name: 'VersatileViewElement',
-  components: { PublicCalendarView, PublicPageNavigation },
+  components: { PublicCalendarView, PublicGalleryView, PublicPageNavigation },
   props: {
     element: { type: Object, required: true },
     mode: { type: String, default: 'editing' },

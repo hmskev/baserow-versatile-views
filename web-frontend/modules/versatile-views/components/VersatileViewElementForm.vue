@@ -13,7 +13,16 @@
       <FormInput v-model="values.config.group_field" type="number" placeholder="e.g. 1234" />
     </FormGroup>
     <FormGroup
-      v-if="layout !== 'kanban'"
+      v-if="layout === 'gallery'"
+      label="Image field ID"
+      small-label
+      required
+      class="margin-bottom-2"
+    >
+      <FormInput v-model="values.config.image_field" type="number" placeholder="e.g. 1234" />
+    </FormGroup>
+    <FormGroup
+      v-if="layout !== 'kanban' && layout !== 'gallery'"
       label="Start date field ID"
       small-label
       required

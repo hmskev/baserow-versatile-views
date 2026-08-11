@@ -28,16 +28,24 @@ export default {
       if (typeof window === 'undefined') return
       try {
         const hostname = window.location.hostname
-        const apiHostname = hostname.startsWith('baserow.')
-          ? hostname
-          : `baserow.${hostname.split('.').slice(1).join('.')}`
         const domain = encodeURIComponent(hostname)
-        const response = await fetch(`${window.location.protocol}//${apiHostname}/api/builder/domains/published/by_name/${domain}/`)
-        if (!response.ok) return
+        const apiUrls = [
+          `${window.location.origin}/api/builder/domains/published/by_name/${domain}/`,
+        ]
+        if (!hostname.startsWith('baserow.')) {
+          const apiHostname = `baserow.${hostname.split('.').slice(1).join('.')}`
+          apiUrls.push(`${window.location.protocol}//${apiHostname}/api/builder/domains/published/by_name/${domain}/`)
+        }
+        let response
+        for (const url of apiUrls) {
+          response = await fetch(url)
+          if (response.ok) break
+        }
+        if (!response?.ok) return
         const data = await response.json()
         this.pages = (data.pages || [])
           .filter((page) => !page.shared && page.path && page.path !== '__shared__')
-          .map((page) => ({ id: page.id, name: page.name, path: page.path }))
+          .map((page) => ({ id: page.id, name: page.name, path: page.path.startsWith('/') ? page.path : `/${page.path}` }))
       } catch (error) {
         // Navigation is supplemental; the view remains usable if metadata is unavailable.
       }

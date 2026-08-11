@@ -8,6 +8,7 @@ from .models import (
     VersatileCalendarElement,
     VersatileKanbanElement,
     VersatileTimelineElement,
+    VersatileGalleryElement,
 )
 
 
@@ -75,3 +76,9 @@ class VersatileTimelineElementType(_VersatileElementType):
     type = "versatile_timeline"
     model_class = VersatileTimelineElement
     display_name = _("Versatile Timeline")
+
+
+class VersatileGalleryElementType(_VersatileElementType):
+    type = "versatile_gallery"
+    model_class = VersatileGalleryElement
+    display_name = _("Versatile Gallery")

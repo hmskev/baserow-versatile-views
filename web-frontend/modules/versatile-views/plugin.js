@@ -4,6 +4,7 @@ import {
   VersatileCalendarElementType,
   VersatileKanbanElementType,
   VersatileTimelineElementType,
+  VersatileGalleryElementType,
 } from './elementTypes.js'
 import {
   HmsCalendarViewType,
@@ -81,6 +82,10 @@ export default defineNuxtPlugin({
     nuxtApp.$registry.register(
       'element',
       new VersatileTimelineElementType(context)
+    )
+    nuxtApp.$registry.register(
+      'element',
+      new VersatileGalleryElementType(context)
     )
   },
 })

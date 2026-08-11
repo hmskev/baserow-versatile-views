@@ -78,3 +78,17 @@ export class VersatileTimelineElementType extends VersatileElementType {
     return 'Display Baserow records on a timeline.'
   }
 }
+
+export class VersatileGalleryElementType extends VersatileElementType {
+  static getType() {
+    return 'versatile_gallery'
+  }
+
+  get name() {
+    return 'Versatile Gallery'
+  }
+
+  get description() {
+    return 'Display Baserow file-field images in a responsive gallery.'
+  }
+}
